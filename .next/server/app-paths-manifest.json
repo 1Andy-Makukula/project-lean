@@ -1,0 +1,6 @@
+{
+  "/page": "app/page.js",
+  "/send/page": "app/send/page.js",
+  "/pay/page": "app/pay/page.js",
+  "/confirmation/page": "app/confirmation/page.js"
+}
