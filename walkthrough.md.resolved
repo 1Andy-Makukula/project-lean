@@ -1,0 +1,82 @@
+# Phase 1 — Supabase Integration Walkthrough
+
+## What Was Done
+
+### 1. SQL Schema ([supabase-schema.sql](file:///c:/Users/Owner/Downloads/project-lean-main/supabase-schema.sql))
+
+Created a complete PostgreSQL schema with 4 tables and supporting infrastructure:
+
+```mermaid
+erDiagram
+    users ||--o{ intents : "sends"
+    users ||--o{ intents : "receives"
+    users ||--o{ shops : "owns"
+    shops ||--|{ items : "lists"
+    items ||--o{ intents : "claimed via"
+
+    users {
+        uuid id PK
+        text phone UK
+        text display_name
+        timestamptz created_at
+    }
+    shops {
+        uuid id PK
+        text name
+        text description
+        uuid owner_id FK
+    }
+    items {
+        uuid id PK
+        uuid shop_id FK
+        text title
+        int price_amount
+        text currency
+        text eta
+        bool in_stock
+    }
+    intents {
+        uuid id PK
+        uuid sender_id FK
+        uuid recipient_id FK
+        uuid item_id FK
+        text claim_code UK
+        intent_status status
+        text message
+        timestamptz updated_at
+    }
+```
+
+**Key design decisions:**
+- **6-char claim codes** generated via `generate_claim_code()` — uses `ABCDEFGHJKLMNPQRSTUVWXYZ23456789` (no I/1/O/0 to avoid confusion) with a uniqueness loop
+- **Status enum** constrains intents to exactly: `created` → `payment_submitted` → `paid` → `redeemed`
+- **RLS enabled** on all tables with permissive service-role policies (fine-grained user policies deferred to later phases)
+- **Auto-updated `updated_at`** via trigger on intents
+
+### 2. Supabase Client ([supabase.ts](file:///c:/Users/Owner/Downloads/project-lean-main/lib/supabase.ts))
+
+Singleton client with runtime env-var guards. Throws descriptive errors if `NEXT_PUBLIC_SUPABASE_URL` or `NEXT_PUBLIC_SUPABASE_ANON_KEY` are missing.
+
+### 3. Environment Setup ([.env.local.example](file:///c:/Users/Owner/Downloads/project-lean-main/.env.local.example))
+
+Template file — copy to `.env.local` and fill in your Supabase Dashboard values.
+
+### 4. Dependency
+
+Installed `@supabase/supabase-js` (added 10 packages, 0 vulnerabilities).
+
+### 5. Gitignore ([.gitignore](file:///c:/Users/Owner/Downloads/project-lean-main/.gitignore))
+
+Updated to properly exclude `.next`, `.env.local`, and `.env*.local`.
+
+## Verification
+
+- **`npm run build`** — exit code 0, all 5 routes prerendered as static content, zero TypeScript or lint errors.
+
+## Next Steps for You
+
+1. **Go to your [Supabase Dashboard](https://supabase.com/dashboard)** → SQL Editor
+2. **Paste the entire contents of [supabase-schema.sql](file:///c:/Users/Owner/Downloads/project-lean-main/supabase-schema.sql)** and click **Run**
+3. **Copy your project URL and anon key** from Settings → API
+4. **Create `.env.local`** from the example: `cp .env.local.example .env.local`
+5. **Fill in your keys** in `.env.local`

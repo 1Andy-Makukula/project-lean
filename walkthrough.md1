@@ -1,0 +1,58 @@
+# KithLy Phase 1–2 Walkthrough
+
+## Phase 1 — Supabase Integration
+
+- Created [supabase-schema.sql](file:///c:/Users/Owner/Downloads/project-lean-main/supabase-schema.sql) with `users`, `shops`, `items`, `intents` tables, 6-char claim codes, `intent_status` enum, RLS
+- Created [supabase.ts](file:///c:/Users/Owner/Downloads/project-lean-main/lib/supabase.ts) — lazy singleton client (build-safe)
+- Created [.env.local.example](file:///c:/Users/Owner/Downloads/project-lean-main/.env.local.example) for Supabase keys
+
+## Phase 2 — Live Data on Home Page
+
+### Changes Made
+
+| File | What changed |
+|------|-------------|
+| [supabase.ts](file:///c:/Users/Owner/Downloads/project-lean-main/lib/supabase.ts) | Refactored from eager `export const` → lazy [getSupabase()](file:///c:/Users/Owner/Downloads/project-lean-main/lib/supabase.ts#8-23) function to prevent build crashes |
+| [types.ts](file:///c:/Users/Owner/Downloads/project-lean-main/lib/types.ts) | **[NEW]** [DbShop](file:///c:/Users/Owner/Downloads/project-lean-main/lib/types.ts#3-10), [DbItem](file:///c:/Users/Owner/Downloads/project-lean-main/lib/types.ts#11-21), [FeedItem](file:///c:/Users/Owner/Downloads/project-lean-main/lib/types.ts#24-31) types + [formatPrice()](file:///c:/Users/Owner/Downloads/project-lean-main/lib/types.ts#34-38) helper |
+| [page.tsx](file:///c:/Users/Owner/Downloads/project-lean-main/app/page.tsx) | Rewritten as `async` Server Component with `force-dynamic`; fetches joined items+shops from Supabase |
+
+### Architecture
+
+```mermaid
+graph LR
+    A["app/page.tsx<br/>(Server Component)"] -->|"getSupabase()"| B["lib/supabase.ts"]
+    B -->|"SELECT items + shops"| C["Supabase PostgreSQL"]
+    A -->|"formatPrice()"| D["lib/types.ts"]
+```
+
+- **[page.tsx](file:///c:/Users/Owner/Downloads/project-lean-main/app/page.tsx)** is `async` + `export const dynamic = 'force-dynamic'` — every request hits Supabase for fresh data
+- The query uses Supabase's relation syntax: `.select("id, title, ..., shops ( name )")` to inline the shop name
+- **Empty state** handled gracefully — if no items exist, a dashed-border placeholder renders
+
+### UI Unchanged
+
+The rendered output is pixel-identical to the previous mock-data version:
+- Same card layout, same breakpoints (`lg:grid-cols-[320px,1fr]`, `md:grid-cols-2`)
+- Same mobile horizontal scroll for shops, same desktop sidebar
+- Same `variant="brand"` orange gradient on all Send/CTA buttons
+
+### Build Verification
+
+- `npm run build` → **exit code 0**
+- Route `/` now marked as `ƒ (Dynamic)` — server-rendered on demand
+- All other routes remain `○ (Static)`
+
+## Phase 3 — Intent Creation (Wiring /send)
+
+### Changes Made
+
+| File | What changed |
+|------|-------------|
+| [app/page.tsx](file:///c:/Users/Owner/Downloads/project-lean-main/app/page.tsx) | Updated "Send" buttons on item cards to link to `/send?item=${item.id}` |
+| [app/send/actions.ts](file:///c:/Users/Owner/Downloads/project-lean-main/app/send/actions.ts) | **[NEW]** Server Action [createIntent(formData)](file:///c:/Users/Owner/Downloads/project-lean-main/app/send/actions.ts#10-82). Validates input, locates/creates the recipient in `users`, resolves the sender (mocked for now), inserts into `intents`, and redirects to `/pay?intent=<id>`. |
+| [components/send-form.tsx](file:///c:/Users/Owner/Downloads/project-lean-main/components/send-form.tsx) | **[NEW]** Client component using `useActionState` to handle the form progressively and show pending state / validation errors. |
+| [app/send/page.tsx](file:///c:/Users/Owner/Downloads/project-lean-main/app/send/page.tsx) | Rewritten as a `force-dynamic` async Server Component. Extracts the `?item=` search param, queries the database for the item details, and renders `<SendForm />` or `notFound()`. |
+
+### Build Verification
+- `npm run build` completed successfully (**exit code 0**).
+- Both `/` and `/send` are now correctly mapped as `ƒ (Dynamic)` routes because they interface with a live database at request-time.
