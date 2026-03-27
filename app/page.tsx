@@ -48,9 +48,9 @@ export default async function HomePage() {
 
   return (
     <SenderShell
-      eyebrow="Phase 1 / Screen 1"
-      title="Shop & item feed"
-      description="A mobile-first catalog that stays generous on desktop: swipeable shop cards on small screens, then expands into a balanced two-column browsing layout."
+      eyebrow="Welcome"
+      title="Send a gift today"
+      description="Select an item from a trusted local shop and send it instantly."
     >
       <section className="space-y-8">
         {/* ── Mobile: horizontal scroll of shop cards ──────── */}
@@ -80,7 +80,7 @@ export default async function HomePage() {
             <CardHeader>
               <CardTitle>Available right now</CardTitle>
               <CardDescription>
-                The desktop layout shifts navigation left and keeps the item grid wide for quick comparison.
+                Browse trusted local shops and their available items.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -115,45 +115,12 @@ export default async function HomePage() {
           </div>
         </div>
 
-        {/* ── Mode Navigation Hub ──────────────────────────── */}
-        <Card className="rounded-2xl border-slate-200 bg-slate-50">
-          <CardHeader>
-            <CardTitle className="text-lg">Quick Navigation</CardTitle>
-            <CardDescription>
-              Access all KithLy modes from here.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-              <Link href="/admin" className="block">
-                <div className="rounded-xl border border-slate-200 bg-white p-4 transition-all hover:shadow-md hover:border-slate-300">
-                  <p className="font-semibold text-slate-900">🔒 Admin Panel</p>
-                  <p className="mt-1 text-xs text-slate-500">Verify payments &amp; manage intents</p>
-                </div>
-              </Link>
-              <Link href="/redeem" className="block">
-                <div className="rounded-xl border border-slate-200 bg-white p-4 transition-all hover:shadow-md hover:border-slate-300">
-                  <p className="font-semibold text-slate-900">🏪 Shop Redeem</p>
-                  <p className="mt-1 text-xs text-slate-500">Enter a 6-character code to release items</p>
-                </div>
-              </Link>
-              <Link href="/claim/TEST01" className="block">
-                <div className="rounded-xl border border-slate-200 bg-white p-4 transition-all hover:shadow-md hover:border-slate-300">
-                  <p className="font-semibold text-slate-900">🎁 Claim (Demo)</p>
-                  <p className="mt-1 text-xs text-slate-500">Recipient view — replace TEST01 with a real code</p>
-                </div>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* ── Empty state ────────────────────────────────── */}
         {items.length === 0 && (
           <div className="rounded-2xl border border-dashed border-slate-300 px-6 py-12 text-center">
             <p className="text-sm font-semibold text-slate-900">No items yet</p>
             <p className="mt-1 text-sm text-slate-500">
               Shops will appear here once they publish their first redeemable items.
-              Check your Supabase connection if this is unexpected.
             </p>
           </div>
         )}

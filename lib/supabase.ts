@@ -1,8 +1,8 @@
 import { createClient, SupabaseClient } from "@supabase/supabase-js";
 
 // ── Lazy singleton ──────────────────────────────────────────
-// The client is created on first use, NOT at import time.
-// This keeps `next build` safe when env vars aren't set yet.
+// Created on first call, NOT at import time.
+// Keeps `next build` safe when env vars aren't injected yet.
 let _client: SupabaseClient | null = null;
 
 export function getSupabase(): SupabaseClient {
@@ -13,7 +13,8 @@ export function getSupabase(): SupabaseClient {
 
     if (!url || !key) {
         throw new Error(
-            "Missing Supabase env vars – copy .env.local.example → .env.local and fill in your project values."
+            "[KithLy] Missing Supabase env vars.\n" +
+            "Set NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in .env.local"
         );
     }
 

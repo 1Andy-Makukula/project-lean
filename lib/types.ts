@@ -3,8 +3,7 @@
 export type DbShop = {
     id: string;
     name: string;
-    description: string | null;
-    owner_id: string | null;
+    location: string | null;
     created_at: string;
 };
 
@@ -12,11 +11,23 @@ export type DbItem = {
     id: string;
     shop_id: string;
     title: string;
-    price_amount: number;   // minor units (e.g. tambala)
+    price_amount: number;   // minor units (e.g. MWK tambala)
     currency: string;
-    eta: string | null;
+    image_url: string | null;
     in_stock: boolean;
     created_at: string;
+};
+
+export type DbIntent = {
+    id: string;
+    item_id: string;
+    sender_phone: string;
+    recipient_phone: string;
+    message: string | null;
+    claim_code: string;     // unique 6-character code
+    status: "created" | "payment_submitted" | "paid" | "redeemed";
+    created_at: string;
+    redeemed_at: string | null;
 };
 
 // ── Joined view used by the home page ───────────────────────
