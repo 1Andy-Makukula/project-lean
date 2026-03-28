@@ -18,7 +18,7 @@ async function getFeedItems(): Promise<{ shops: string[]; items: FeedItem[] }> {
 
   const { data, error } = await supabase
     .from("items")
-    .select("id, title, price_amount, currency, eta, in_stock, image_url, shops ( name )")
+    .select("id, title, description, price_amount, currency, eta, in_stock, image_url, shops ( name )")
     .eq("in_stock", true)
     .order("created_at", { ascending: false });
 
@@ -32,6 +32,7 @@ async function getFeedItems(): Promise<{ shops: string[]; items: FeedItem[] }> {
     id: row.id,
     shop: row.shops?.name ?? "Unknown shop",
     title: row.title,
+    description: row.description ?? null,
     price: formatPrice(row.price_amount, row.currency),
     eta: row.eta ?? "Redeem in-store",
     image_url: row.image_url ?? null,
@@ -106,9 +107,13 @@ export default async function HomePage() {
             {items.map((item) => (
               <ItemCard
                 key={item.id}
-                name={item.title}
-                price={item.price}
-                image_url={item.image_url}
+                shopName={item.shop}
+                item={{
+                  title: item.title,
+                  description: item.description,
+                  price: item.price,
+                  image_url: item.image_url
+                }}
                 sendHref={`/send/${item.id}`}
               />
             ))}

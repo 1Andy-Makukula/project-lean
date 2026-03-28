@@ -11,6 +11,7 @@ const config: Config = {
       colors: {
         background: "#ffffff",
         foreground: "#0f172a",
+        "brand-orange": "#f97316",
         kithly: {
           orange: "#f97316",
         },

@@ -11,20 +11,30 @@
       "static/chunks/main-app.js",
       "static/chunks/app/page.js"
     ],
-    "/send/page": [
+    "/send/[itemId]/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/send/page.js"
+      "static/chunks/app/send/[itemId]/page.js"
     ],
-    "/pay/page": [
+    "/redeem/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/pay/page.js"
+      "static/chunks/app/redeem/page.js"
     ],
-    "/confirmation/page": [
+    "/admin/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/confirmation/page.js"
+      "static/chunks/app/admin/page.js"
+    ],
+    "/pay/[intentId]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/pay/[intentId]/page.js"
+    ],
+    "/claim/[code]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/claim/[code]/page.js"
     ]
   }
 }

@@ -34,17 +34,18 @@ export function SendForm({ item }: SendFormProps) {
                     <CardHeader>
                         <CardTitle>Recipient details</CardTitle>
                         <CardDescription>
-                            Only the essentials needed to create the intent and prepare the share link.
+                            Enter the recipient's phone number and an optional message.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-900">
+                            <label htmlFor="phone" className="text-sm font-medium text-slate-900">
                                 Recipient phone number
                             </label>
                             <div className="relative">
                                 <Phone className="pointer-events-none absolute left-4 top-4 h-4 w-4 text-slate-400" />
                                 <Input
+                                    id="phone"
                                     name="phone"
                                     placeholder="+265 9XX XXX XXX"
                                     required
@@ -57,12 +58,13 @@ export function SendForm({ item }: SendFormProps) {
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-medium text-slate-900">
-                                Optional message
+                            <label htmlFor="message" className="text-sm font-medium text-slate-900">
+                                Include a message
                             </label>
                             <div className="relative">
                                 <MessageSquareText className="pointer-events-none absolute left-4 top-4 h-4 w-4 text-slate-400" />
                                 <Textarea
+                                    id="message"
                                     name="message"
                                     placeholder="For the week ahead. Pick it up when it suits you."
                                     className="pl-10 pt-10"
@@ -97,7 +99,7 @@ export function SendForm({ item }: SendFormProps) {
                     <CardHeader>
                         <CardTitle>Selected item</CardTitle>
                         <CardDescription>
-                            Clear purchase summary before the sender proceeds to manual payment.
+                            Review your selection before proceeding to payment.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-4">
@@ -128,7 +130,7 @@ export function SendForm({ item }: SendFormProps) {
                                 className="w-full"
                                 disabled={isPending}
                             >
-                                {isPending ? "Creating intent…" : "Continue to payment"}
+                                {isPending ? "Creating intent…" : "Continue to Payment"}
                             </Button>
                         </div>
                     </CardContent>
@@ -145,7 +147,7 @@ export function SendForm({ item }: SendFormProps) {
                         className="w-full"
                         disabled={isPending}
                     >
-                        {isPending ? "Creating intent…" : "Continue to payment"}
+                        {isPending ? "Creating intent…" : "Continue to Payment"}
                     </Button>
                 </div>
             </div>

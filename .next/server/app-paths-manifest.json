@@ -1,6 +1,8 @@
 {
+  "/send/[itemId]/page": "app/send/[itemId]/page.js",
   "/page": "app/page.js",
-  "/send/page": "app/send/page.js",
-  "/pay/page": "app/pay/page.js",
-  "/confirmation/page": "app/confirmation/page.js"
+  "/claim/[code]/page": "app/claim/[code]/page.js",
+  "/pay/[intentId]/page": "app/pay/[intentId]/page.js",
+  "/redeem/page": "app/redeem/page.js",
+  "/admin/page": "app/admin/page.js"
 }

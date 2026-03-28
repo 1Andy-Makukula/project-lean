@@ -11,6 +11,7 @@ export type DbItem = {
     id: string;
     shop_id: string;
     title: string;
+    description: string | null;
     price_amount: number;   // minor units (e.g. MWK tambala)
     currency: string;
     image_url: string | null;
@@ -36,6 +37,7 @@ export type FeedItem = {
     id: string;
     shop: string;           // denormalised shop name
     title: string;
+    description: string | null;
     price: string;          // formatted, e.g. "MWK 18,000"
     eta: string;
     image_url: string | null;

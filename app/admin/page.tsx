@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { SenderShell } from "@/components/sender-shell";
+import { AdminDashboard } from "@/components/admin-dashboard";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -31,8 +32,8 @@ export default function AdminPage() {
                     : "Enter the Master PIN to access the admin control room."
             }
         >
-            <div className="mx-auto max-w-md mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-10">
-                {!isAuthorized ? (
+            {!isAuthorized ? (
+                <div className="mx-auto max-w-md mt-6 rounded-3xl border border-slate-200 bg-white p-6 shadow-sm md:p-10">
                     <form onSubmit={handlePinSubmit} className="space-y-6">
                         <div className="space-y-2">
                             <label htmlFor="admin-pin" className="text-sm font-medium text-slate-900">
@@ -63,15 +64,12 @@ export default function AdminPage() {
                             Access Control Room
                         </Button>
                     </form>
-                ) : (
-                    <div className="py-8 text-center">
-                        <p className="text-sm font-semibold text-slate-900">Admin Table Goes Here</p>
-                        <p className="mt-1 text-sm text-slate-500">
-                            The full intent management table will be rendered in the next step.
-                        </p>
-                    </div>
-                )}
-            </div>
+                </div>
+            ) : (
+                <div className="mt-6">
+                    <AdminDashboard />
+                </div>
+            )}
         </SenderShell>
     );
 }

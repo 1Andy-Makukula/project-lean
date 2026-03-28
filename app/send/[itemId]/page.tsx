@@ -30,7 +30,7 @@ async function getItem(itemId: string) {
     };
 }
 
-export default async function SendPage({ params }: Props) {
+export default async function SendItemPage({ params }: Props) {
     const { itemId } = await params;
 
     if (!itemId) notFound();
@@ -40,9 +40,9 @@ export default async function SendPage({ params }: Props) {
 
     return (
         <SenderShell
-            eyebrow="Phase 1 / Screen 2"
-            title="Intent creation"
-            description="A narrow, high-trust form. The primary mobile action stays sticky and full width, while desktop opens into a summary-plus-form split."
+            eyebrow="Send a Gift"
+            title={item.title}
+            description={`From ${item.shop} · ${item.price}`}
         >
             <SendForm item={item} />
         </SenderShell>

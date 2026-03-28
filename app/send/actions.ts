@@ -7,6 +7,16 @@ export type CreateIntentState = {
     error?: string;
 };
 
+/** Generate a random 6-character uppercase alphanumeric code, e.g. "X7B9Q2" */
+function generateClaimCode(): string {
+    const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // no I/O/0/1 to avoid ambiguity
+    let code = "";
+    for (let i = 0; i < 6; i++) {
+        code += chars[Math.floor(Math.random() * chars.length)];
+    }
+    return code;
+}
+
 export async function createIntent(
     _prev: CreateIntentState,
     formData: FormData
@@ -24,49 +34,19 @@ export async function createIntent(
         return { error: "Please enter a valid phone number." };
     }
 
-    // ── Find or create the recipient user by phone ──────────
-    const supabase = getSupabase();
-
-    let recipientId: string | null = null;
-
-    const { data: existingUser } = await supabase
-        .from("users")
-        .select("id")
-        .eq("phone", phone)
-        .single();
-
-    if (existingUser) {
-        recipientId = existingUser.id;
-    } else {
-        const { data: newUser, error: userErr } = await supabase
-            .from("users")
-            .insert({ phone, display_name: phone })
-            .select("id")
-            .single();
-
-        if (userErr || !newUser) {
-            return { error: "Could not register recipient. Please try again." };
-        }
-        recipientId = newUser.id;
-    }
-
-    // ── Create a placeholder sender (MVP — no auth yet) ─────
-    // In production this would come from the authenticated session.
-    const senderId = await getOrCreateSender(supabase);
-
-    if (!senderId) {
-        return { error: "Could not identify sender. Please try again." };
-    }
-
     // ── Insert the intent ───────────────────────────────────
-    // claim_code and status default are handled by the DB schema.
+    const supabase = getSupabase();
+    const claimCode = generateClaimCode();
+
     const { data: intent, error: intentErr } = await supabase
         .from("intents")
         .insert({
-            sender_id: senderId,
-            recipient_id: recipientId,
             item_id: itemId,
+            sender_phone: "+265000000000",   // MVP dummy sender — no auth
+            recipient_phone: phone,
             message,
+            claim_code: claimCode,
+            status: "created",
         })
         .select("id")
         .single();
@@ -78,26 +58,4 @@ export async function createIntent(
 
     // ── Redirect to payment page ────────────────────────────
     redirect(`/pay/${intent.id}`);
-}
-
-// ── Helper: MVP sender ──────────────────────────────────────
-// Uses a fixed demo sender until auth is wired up.
-async function getOrCreateSender(supabase: ReturnType<typeof getSupabase>): Promise<string | null> {
-    const DEMO_PHONE = "+265000000000";
-
-    const { data: existing } = await supabase
-        .from("users")
-        .select("id")
-        .eq("phone", DEMO_PHONE)
-        .single();
-
-    if (existing) return existing.id;
-
-    const { data: created } = await supabase
-        .from("users")
-        .insert({ phone: DEMO_PHONE, display_name: "KithLy Sender" })
-        .select("id")
-        .single();
-
-    return created?.id ?? null;
 }
