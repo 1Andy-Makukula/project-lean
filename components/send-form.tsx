@@ -39,6 +39,25 @@ export function SendForm({ item }: SendFormProps) {
                     </CardHeader>
                     <CardContent className="space-y-6">
                         <div className="space-y-2">
+                            <label htmlFor="senderPhone" className="text-sm font-medium text-slate-900">
+                                Your Airtel number (Sender)
+                            </label>
+                            <div className="relative">
+                                <Phone className="pointer-events-none absolute left-4 top-4 h-4 w-4 text-slate-400" />
+                                <Input
+                                    id="senderPhone"
+                                    name="senderPhone"
+                                    placeholder="+265 9XX XXX XXX"
+                                    required
+                                    className="pl-10"
+                                />
+                            </div>
+                            <p className="text-sm text-slate-500">
+                                Your number — used to verify the Airtel Money payment.
+                            </p>
+                        </div>
+
+                        <div className="space-y-2">
                             <label htmlFor="phone" className="text-sm font-medium text-slate-900">
                                 Recipient phone number
                             </label>

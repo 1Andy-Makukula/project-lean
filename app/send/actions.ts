@@ -22,6 +22,7 @@ export async function createIntent(
     formData: FormData
 ): Promise<CreateIntentState> {
     const itemId = formData.get("itemId") as string;
+    const senderPhone = (formData.get("senderPhone") as string)?.trim();
     const phone = (formData.get("phone") as string)?.trim();
     const message = (formData.get("message") as string)?.trim() || null;
 
@@ -30,8 +31,12 @@ export async function createIntent(
         return { error: "No item selected." };
     }
 
+    if (!senderPhone || senderPhone.length < 6) {
+        return { error: "Please enter your Airtel number." };
+    }
+
     if (!phone || phone.length < 6) {
-        return { error: "Please enter a valid phone number." };
+        return { error: "Please enter a valid recipient phone number." };
     }
 
     // ── Insert the intent ───────────────────────────────────
@@ -42,7 +47,7 @@ export async function createIntent(
         .from("intents")
         .insert({
             item_id: itemId,
-            sender_phone: "+265000000000",   // MVP dummy sender — no auth
+            sender_phone: senderPhone,
             recipient_phone: phone,
             message,
             claim_code: claimCode,
