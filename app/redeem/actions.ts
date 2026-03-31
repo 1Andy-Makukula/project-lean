@@ -126,10 +126,10 @@ export async function getShopMetrics(shopId: string): Promise<ShopDashboardMetri
     // We fetch updated_at to know exactly when the item was handed over
     const { data: intents, error: intentsErr } = await supabase
         .from("intents")
-        .select(`id, status, claim_code, transaction_id, created_at, updated_at, items!inner ( id, shop_id, price_amount, title )`)
+        .select(`id, status, claim_code, transaction_id, created_at, items!inner ( id, shop_id, price_amount, title )`)
         .eq("items.shop_id", shopId)
         .in("status", ["paid", "redeemed"])
-        .order("updated_at", { ascending: false });
+        .order("created_at", { ascending: false });
 
     if (intentsErr) return null;
 
@@ -147,8 +147,7 @@ export async function getShopMetrics(shopId: string): Promise<ShopDashboardMetri
         const itemData = Array.isArray(intent.items) ? intent.items[0] : intent.items;
         const priceAmount = itemData?.price_amount || 0;
         
-        // Use updated_at if available, fallback to created_at
-        const actionDate = new Date(intent.updated_at || intent.created_at);
+        const actionDate = new Date(intent.created_at);
         const isRecent = actionDate >= sevenDaysAgo;
 
         const orderSummary = {
