@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Link2, MessageCircleMore, Package, TrendingUp, ShoppingBag, Loader2, ImageIcon, Clock, CheckCircle2 } from "lucide-react";
+import { Link2, MessageCircleMore, Package, TrendingUp, ShoppingBag, Loader2, ImageIcon, Clock, CheckCircle2, History } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -174,6 +174,60 @@ export function ShopDashboard({ shopId, shopName }: Props) {
                     </Button>
                 </CardContent>
             </Card>
+
+            {/* ── Section 5: Store History & Analytics ─────────────── */}
+            <div className="space-y-4 pt-4 border-t border-slate-200 mt-8">
+                <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <History className="h-5 w-5 text-indigo-500" /> History & Analytics
+                </h2>
+                
+                {/* 7-Day Quick Stats */}
+                <div className="grid grid-cols-2 gap-4">
+                    <Card className="border-indigo-100 bg-indigo-50/50 shadow-sm">
+                        <CardContent className="p-4">
+                            <p className="text-sm font-medium text-slate-500">7-Day Revenue</p>
+                            <p className="text-2xl font-black text-slate-900 mt-1">
+                                {formatPrice(metrics.thisWeekRevenue, "ZMW")}
+                            </p>
+                        </CardContent>
+                    </Card>
+                    <Card className="border-indigo-100 bg-indigo-50/50 shadow-sm">
+                        <CardContent className="p-4">
+                            <p className="text-sm font-medium text-slate-500">7-Day Sales</p>
+                            <p className="text-2xl font-black text-slate-900 mt-1">
+                                {metrics.thisWeekSales} <span className="text-base font-medium text-slate-500">items</span>
+                            </p>
+                        </CardContent>
+                    </Card>
+                </div>
+
+                {/* Detailed Transaction Ledger */}
+                <Card className="border-slate-200 shadow-sm overflow-hidden">
+                    <CardHeader className="py-4 border-b border-slate-100 bg-slate-50/50">
+                        <CardTitle className="text-sm font-bold uppercase tracking-wider text-slate-500">Recent Transactions</CardTitle>
+                    </CardHeader>
+                    <CardContent className="p-0">
+                        {metrics.completedOrders.length === 0 ? (
+                            <div className="p-8 text-center text-sm text-slate-500">No history available yet.</div>
+                        ) : (
+                            <div className="divide-y divide-slate-100 max-h-[400px] overflow-y-auto">
+                                {metrics.completedOrders.slice(0, 20).map(order => (
+                                    <div key={order.id} className="p-4 flex justify-between items-center hover:bg-slate-50 transition-colors">
+                                        <div>
+                                            <p className="font-bold text-slate-900 text-sm">{order.title}</p>
+                                            <p className="text-xs text-slate-500 mt-1">{order.date}</p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="font-bold text-emerald-600 text-sm">+{formatPrice(order.price, "ZMW")}</p>
+                                            <p className="text-[10px] font-mono font-medium text-slate-400 mt-1 uppercase">TID: {order.transactionId}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </CardContent>
+                </Card>
+            </div>
         </div>
     );
 }

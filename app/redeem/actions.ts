@@ -97,9 +97,11 @@ export async function verifyShopPin(pin: string) {
 export type ShopDashboardMetrics = {
     revenue: number;
     totalSales: number;
+    thisWeekRevenue: number;
+    thisWeekSales: number;
     items: { id: string; title: string; price: string; imageUrl: string | null; inStock: boolean; }[];
-    pendingOrders: { id: string; claimCode: string; title: string; transactionId: string | null; }[];
-    completedOrders: { id: string; claimCode: string; title: string; transactionId: string | null; }[];
+    pendingOrders: { id: string; claimCode: string; title: string; transactionId: string | null; date: string; }[];
+    completedOrders: { id: string; claimCode: string; title: string; transactionId: string | null; date: string; price: number; }[];
 };
 
 export async function getShopMetrics(shopId: string): Promise<ShopDashboardMetrics | null> {
@@ -116,42 +118,67 @@ export async function getShopMetrics(shopId: string): Promise<ShopDashboardMetri
     const formattedItems = (items || []).map((item: any) => ({
         id: item.id,
         title: item.title,
-        price: formatPrice(item.price_amount, item.currency),
+        price: formatPrice(item.price_amount, item.currency || "ZMW"),
         imageUrl: item.image_url,
         inStock: item.in_stock,
     }));
 
+    // We fetch updated_at to know exactly when the item was handed over
     const { data: intents, error: intentsErr } = await supabase
         .from("intents")
-        .select(`id, status, claim_code, transaction_id, items!inner ( id, shop_id, price_amount, title )`)
+        .select(`id, status, claim_code, transaction_id, created_at, updated_at, items!inner ( id, shop_id, price_amount, title )`)
         .eq("items.shop_id", shopId)
         .in("status", ["paid", "redeemed"])
-        .order("created_at", { ascending: false });
+        .order("updated_at", { ascending: false });
 
     if (intentsErr) return null;
 
     let revenue = 0;
+    let thisWeekRevenue = 0;
+    let thisWeekSales = 0;
     const pendingOrders: any[] = [];
     const completedOrders: any[] = [];
 
+    // Calculate the date 7 days ago for our weekly metrics
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+
     (intents || []).forEach((intent: any) => {
         const itemData = Array.isArray(intent.items) ? intent.items[0] : intent.items;
-        revenue += itemData?.price_amount || 0;
+        const priceAmount = itemData?.price_amount || 0;
+        
+        // Use updated_at if available, fallback to created_at
+        const actionDate = new Date(intent.updated_at || intent.created_at);
+        const isRecent = actionDate >= sevenDaysAgo;
 
         const orderSummary = {
             id: intent.id,
             claimCode: intent.claim_code,
             title: itemData?.title || "Unknown Item",
             transactionId: intent.transaction_id,
+            price: priceAmount,
+            date: actionDate.toLocaleDateString('en-ZM', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' }),
         };
 
-        if (intent.status === "paid") pendingOrders.push(orderSummary);
-        if (intent.status === "redeemed") completedOrders.push(orderSummary);
+        if (intent.status === "paid") {
+            pendingOrders.push(orderSummary);
+        }
+        if (intent.status === "redeemed") {
+            revenue += priceAmount;
+            completedOrders.push(orderSummary);
+            
+            if (isRecent) {
+                thisWeekRevenue += priceAmount;
+                thisWeekSales += 1;
+            }
+        }
     });
 
     return {
         revenue,
-        totalSales: completedOrders.length, // Only count handed-over items
+        totalSales: completedOrders.length,
+        thisWeekRevenue,
+        thisWeekSales,
         items: formattedItems,
         pendingOrders,
         completedOrders
