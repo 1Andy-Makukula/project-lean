@@ -13,6 +13,8 @@ interface PaymentTerminalProps {
     details: {
         itemTitle: string;
         shopName: string;
+        airtelNumber: string;
+        airtelName: string;
         recipientPhone: string;
         price: string;
     };
@@ -52,15 +54,15 @@ export function PaymentTerminal({ intentId, details }: PaymentTerminalProps) {
                 </CardHeader>
                 <CardContent className="space-y-4">
                     <div className="rounded-2xl bg-slate-50 p-5 border border-slate-100">
-                        <p className="text-sm text-slate-600 font-medium">1. Send funds to this number</p>
+                        <p className="text-sm text-slate-600 font-medium">1. Send funds directly to the shop</p>
                         <div className="mt-3 flex items-start justify-between gap-4">
                             <div>
-                                <p className="text-3xl font-black text-slate-900 tracking-tight">097 357 5666</p>
+                                <p className="text-3xl font-black text-slate-900 tracking-tight">{details.airtelNumber}</p>
                                 <span className="text-sm font-medium text-slate-500 bg-slate-100 px-3 py-1 rounded-full inline-block mt-2">
-                                    Registered Name: Raphael Makukula
+                                    Registered Name: {details.airtelName}
                                 </span>
                             </div>
-                            <CopyButton value="0973575666" />
+                            <CopyButton value={details.airtelNumber} />
                         </div>
                     </div>
 

@@ -18,20 +18,13 @@ async function getIntentDetails(intentId: string) {
     const { data: intent, error } = await supabase
         .from("intents")
         .select(`
-            id,
-            status,
-            claim_code,
-            sender_phone,
-            recipient_phone,
-            items ( title, price_amount, currency, shops ( name ) )
+            id, status, claim_code, sender_phone, sender_name, recipient_phone, message,
+            items ( title, price_amount, currency, shops ( name, airtel_number, airtel_name ) )
         `)
         .eq("id", intentId)
         .single();
 
-    if (error) {
-        console.error("[KithLy] Intent Fetch Error:", error.message);
-        return null;
-    }
+    if (error) return null;
     if (!intent) return null;
 
     const itemData = Array.isArray(intent.items) ? intent.items[0] : intent.items;
@@ -43,9 +36,12 @@ async function getIntentDetails(intentId: string) {
         claimCode: intent.claim_code,
         itemTitle: (itemData as any)?.title || "Unknown item",
         shopName: (shopData as any)?.name || "Unknown shop",
-        price: formatPrice((itemData as any)?.price_amount || 0, (itemData as any)?.currency || "MWK"),
-        senderName: intent.sender_phone || "Sender",
+        airtelNumber: (shopData as any)?.airtel_number || "Contact Admin",
+        airtelName: (shopData as any)?.airtel_name || "Unknown",
+        price: formatPrice((itemData as any)?.price_amount || 0, (itemData as any)?.currency || "ZMW"),
+        senderName: intent.sender_name || "Sender",
         recipientPhone: intent.recipient_phone || "",
+        message: intent.message,
     };
 }
 
@@ -60,7 +56,9 @@ export default async function PayPage({ params }: Props) {
 
     // ── State 2: Payment Submitted (or further) ────────────────────────
     if (details.status !== "created") {
-        const whatsappMessageTemplate = `Hi! Someone sent you a ${details.itemTitle} from ${details.shopName}. Open your KithLy link to track payment confirmation and collect your code: [CLAIM_URL]`;
+        const whatsappMessageTemplate = details.message
+            ? `Hi! ${details.senderName} sent you a ${details.itemTitle} from ${details.shopName}. They said: "${details.message}". Open your KithLy link to collect your code: [CLAIM_URL]`
+            : `Hi! ${details.senderName} sent you a ${details.itemTitle} from ${details.shopName}. Open your KithLy link to collect your code: [CLAIM_URL]`;
 
         return (
             <RealtimeSenderReceipt

@@ -1,29 +1,48 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { CheckCircle2, QrCode } from "lucide-react";
+import Image from "next/image";
+import { CheckCircle2, QrCode, ShieldAlert, ImageIcon, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { submitRedeemCode, type RedeemState } from "@/app/redeem/actions";
+import { submitRedeemCode, finalizeRedemption, rejectRedemption, type RedeemState } from "@/app/redeem/actions";
 
 export function RedeemForm() {
-    // We add a key to the form to force a full internal state reset when hitting "Scan Another"
     const [resetKey, setResetKey] = useState(0);
+    const [isFinalizing, setIsFinalizing] = useState(false);
+    const [isRejecting, setIsRejecting] = useState(false);
+    const [finalSuccess, setFinalSuccess] = useState(false);
 
     const [state, formAction, isPending] = useActionState<RedeemState, FormData>(
         submitRedeemCode,
         {}
     );
 
-    const handleReset = () => {
-        setResetKey((k) => k + 1);
-        // A hacky but effective way to clear the action state is re-mounting the form,
-        // but useActionState holds state. We'll track it conditionally instead if needed,
-        // or just rely on a completely separate conditional block that hides the form.
+    const handleFinalize = async (intentId: string) => {
+        setIsFinalizing(true);
+        const result = await finalizeRedemption(intentId);
+        if (result.success) {
+            setFinalSuccess(true);
+        } else {
+            alert(result.error);
+        }
+        setIsFinalizing(false);
     };
 
-    if (state?.success) {
+    const handleReject = async (intentId: string) => {
+        if (!confirm("Are you sure? This will cancel the order entirely.")) return;
+        setIsRejecting(true);
+        const result = await rejectRedemption(intentId);
+        if (result.success) {
+            window.location.reload();
+        } else {
+            alert(result.error);
+            setIsRejecting(false);
+        }
+    };
+
+    if (finalSuccess) {
         return (
             <div className="flex flex-col items-center justify-center space-y-6 py-8 text-center animate-in zoom-in-95 duration-300">
                 <div className="rounded-full bg-green-50 p-4">
@@ -31,20 +50,68 @@ export function RedeemForm() {
                 </div>
                 <div className="space-y-2">
                     <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
-                        {state.message}
+                        Item Handed Over
                     </h2>
                     <p className="text-lg font-medium text-slate-500">
-                        Item: <span className="text-slate-900">{state.itemTitle}</span>
+                        The transaction is complete.
                     </p>
                 </div>
-                {/* Normally we wouldn't use window.location.reload() for SPA resets, but since useActionState persists indefinitely without a reset method in React 19 currently, a hard refresh or conditional wrapper is safest for the shop terminal MVP! */}
-                <Button
-                    variant="outline"
-                    size="lg"
-                    className="mt-8 w-full max-w-sm"
-                    onClick={() => window.location.reload()}
-                >
+                <Button variant="outline" size="lg" className="mt-8 w-full max-w-sm" onClick={() => window.location.reload()}>
                     Redeem Another Code
+                </Button>
+            </div>
+        );
+    }
+
+    if (state?.success && state.intentId) {
+        return (
+            <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-300">
+                <div className="rounded-2xl border-2 border-brand-orange bg-orange-50/50 p-6 text-center">
+                    <ShieldAlert className="mx-auto h-12 w-12 text-brand-orange mb-3" />
+                    <h3 className="text-xl font-black text-slate-900 mb-1">Verify Airtel Payment</h3>
+                    <p className="text-sm text-slate-700">
+                        Check your physical Airtel phone. Did you receive a payment with this exact TID?
+                    </p>
+                    <div className="mt-4 inline-block bg-white border border-orange-200 rounded-xl px-6 py-3 shadow-sm">
+                        <p className="text-xs uppercase font-bold text-slate-400 mb-1">Sender's TID</p>
+                        <p className="text-2xl font-mono font-black text-slate-900">{state.transactionId}</p>
+                    </div>
+                </div>
+
+                <div className="flex gap-4 p-4 border border-slate-200 rounded-2xl bg-white shadow-sm">
+                    <div className="relative w-24 h-24 bg-slate-100 rounded-lg overflow-hidden shrink-0">
+                        {state.imageUrl ? (
+                            <Image src={state.imageUrl} alt={state.itemTitle || "Item"} fill className="object-cover" />
+                        ) : (
+                            <div className="absolute inset-0 flex items-center justify-center">
+                                <ImageIcon className="h-6 w-6 text-slate-300" />
+                            </div>
+                        )}
+                    </div>
+                    <div className="flex flex-col justify-center">
+                        <p className="text-xl font-bold text-slate-900">{state.itemTitle}</p>
+                        <p className="text-lg font-semibold text-slate-500 mt-1">{state.price}</p>
+                    </div>
+                </div>
+
+                <Button
+                    onClick={() => handleFinalize(state.intentId!)}
+                    disabled={isFinalizing}
+                    className="w-full h-14 text-lg bg-green-600 hover:bg-green-700 text-white shadow-md font-bold"
+                >
+                    {isFinalizing ? <Loader2 className="h-5 w-5 animate-spin" /> : "Approve TID & Mark Sold"}
+                </Button>
+
+                <Button
+                    onClick={() => handleReject(state.intentId!)}
+                    disabled={isRejecting}
+                    className="w-full h-14 text-lg bg-red-600 hover:bg-red-700 text-white shadow-md font-bold"
+                >
+                    {isRejecting ? <Loader2 className="h-5 w-5 animate-spin" /> : "Reject – Fake TID"}
+                </Button>
+
+                <Button variant="ghost" className="w-full text-slate-500" onClick={() => window.location.reload()}>
+                    Cancel
                 </Button>
             </div>
         );
@@ -71,25 +138,9 @@ export function RedeemForm() {
             )}
 
             <div className="space-y-4">
-                <Input
-                    name="code"
-                    type="text"
-                    required
-                    maxLength={6}
-                    placeholder="e.g. A1B2C3"
-                    className="h-16 text-center text-3xl font-mono uppercase tracking-widest shadow-sm"
-                    autoComplete="off"
-                    autoFocus
-                />
-
-                <Button
-                    type="submit"
-                    variant="brand"
-                    size="lg"
-                    className="w-full text-lg h-14"
-                    disabled={isPending}
-                >
-                    {isPending ? "Verifying..." : "Redeem Item"}
+                <Input name="code" type="text" required maxLength={6} placeholder="e.g. A1B2C3" className="h-16 text-center text-3xl font-mono uppercase tracking-widest shadow-sm" autoComplete="off" autoFocus />
+                <Button type="submit" variant="brand" size="lg" className="w-full text-lg h-14" disabled={isPending}>
+                    {isPending ? "Checking..." : "Review Order"}
                 </Button>
             </div>
         </form>

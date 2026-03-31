@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import { LockKeyhole, MessageSquareText, Phone } from "lucide-react";
+import { LockKeyhole, MessageSquareText, Phone, User } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,31 +29,33 @@ export function SendForm({ item }: SendFormProps) {
             <input type="hidden" name="itemId" value={item.id} />
 
             <section className="grid gap-6 lg:grid-cols-[1.1fr,0.9fr]">
-                {/* ── Recipient form card ──────────────────── */}
+                {/* ── Delivery details card ──────────────────── */}
                 <Card className="order-2 lg:order-1">
                     <CardHeader>
-                        <CardTitle>Recipient details</CardTitle>
+                        <CardTitle>Delivery details</CardTitle>
                         <CardDescription>
-                            Enter the recipient's phone number and an optional message.
+                            Let us know who is sending this and where to send the pickup link.
                         </CardDescription>
                     </CardHeader>
                     <CardContent className="space-y-6">
+                        
+                        {/* ── NEW: Sender Name Input ────────────── */}
                         <div className="space-y-2">
-                            <label htmlFor="senderPhone" className="text-sm font-medium text-slate-900">
-                                Your Airtel number (Sender)
+                            <label htmlFor="senderName" className="text-sm font-medium text-slate-900">
+                                Your name (Sender)
                             </label>
                             <div className="relative">
-                                <Phone className="pointer-events-none absolute left-4 top-4 h-4 w-4 text-slate-400" />
+                                <User className="pointer-events-none absolute left-4 top-4 h-4 w-4 text-slate-400" />
                                 <Input
-                                    id="senderPhone"
-                                    name="senderPhone"
-                                    placeholder="+265 9XX XXX XXX"
+                                    id="senderName"
+                                    name="senderName"
+                                    placeholder="e.g. John Doe"
                                     required
                                     className="pl-10"
                                 />
                             </div>
                             <p className="text-sm text-slate-500">
-                                Your number — used to verify the Airtel Money payment.
+                                This will be shown to the recipient.
                             </p>
                         </div>
 

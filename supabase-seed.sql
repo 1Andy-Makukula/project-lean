@@ -15,9 +15,9 @@ ON CONFLICT (id) DO NOTHING;
 -- 2. Items
 INSERT INTO public.items (id, shop_id, title, price_amount, currency, image_url, in_stock)
 VALUES
-  ('55555555-5555-5555-5555-555555555555', '33333333-3333-3333-3333-333333333333', 'Essential Groceries Bundle', 18000, 'MWK', 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80', true),
-  ('66666666-6666-6666-6666-666666666666', '33333333-3333-3333-3333-333333333333', 'Fresh Fruit Basket', 12000, 'MWK', 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=800&q=80', true),
-  ('77777777-7777-7777-7777-777777777777', '44444444-4444-4444-4444-444444444444', 'Wireless Earbuds', 35000, 'MWK', 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800&q=80', true)
+  ('55555555-5555-5555-5555-555555555555', '33333333-3333-3333-3333-333333333333', 'Essential Groceries Bundle', 18000, 'ZMW', 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=800&q=80', true),
+  ('66666666-6666-6666-6666-666666666666', '33333333-3333-3333-3333-333333333333', 'Fresh Fruit Basket', 12000, 'ZMW', 'https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=800&q=80', true),
+  ('77777777-7777-7777-7777-777777777777', '44444444-4444-4444-4444-444444444444', 'Wireless Earbuds', 35000, 'ZMW', 'https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=800&q=80', true)
 ON CONFLICT (id) DO NOTHING;
 
 -- 3. Test Intent (for the /claim/TEST01 route)

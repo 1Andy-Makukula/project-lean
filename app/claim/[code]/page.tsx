@@ -17,7 +17,7 @@ async function getIntentByCode(code: string) {
         .select(`
             status,
             claim_code,
-            sender_phone,
+            sender_name,
             message,
             items ( title, image_url, shops ( name, location ) )
         `)
@@ -36,7 +36,7 @@ async function getIntentByCode(code: string) {
     return {
         status: intent.status,
         claimCode: intent.claim_code,
-        senderPhone: intent.sender_phone,
+        senderName: intent.sender_name || "Someone",
         message: intent.message || "Enjoy this gift!",
         itemTitle: (itemData as any)?.title || "Unknown item",
         imageUrl: (itemData as any)?.image_url || null,

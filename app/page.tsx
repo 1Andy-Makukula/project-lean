@@ -130,6 +130,16 @@ export default async function HomePage() {
           </div>
         )}
       </section>
+
+            {/* ── Footer / Recovery Link ── */}
+            <footer className="mt-16 border-t border-slate-200 py-8 text-center">
+                <p className="text-sm text-slate-500">
+                    Lost your WhatsApp sharing link?{" "}
+                    <Link href="/track" className="font-semibold text-brand-orange hover:underline">
+                        Track your gift here.
+                    </Link>
+                </p>
+            </footer>
     </SenderShell>
   );
 }

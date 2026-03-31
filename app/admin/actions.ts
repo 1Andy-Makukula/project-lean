@@ -74,7 +74,7 @@ export async function getAdminIntents(): Promise<AdminIntent[]> {
             senderPhone: intent.sender_phone || "Unknown",
             recipientPhone: intent.recipient_phone || "Unknown",
             itemTitle: (itemData as any)?.title || "Unknown item",
-            price: formatPrice((itemData as any)?.price_amount || 0, (itemData as any)?.currency || "MWK"),
+            price: formatPrice((itemData as any)?.price_amount || 0, (itemData as any)?.currency || "ZMW"),
             createdAt: intent.created_at,
             paymentReference: intent.payment_reference || null,
         };
@@ -133,12 +133,24 @@ export async function getShops(): Promise<AdminShop[]> {
     }));
 }
 
-export async function createShop(name: string, location: string, pinCode: string): Promise<ActionResult> {
+export async function createShop(
+    name: string,
+    location: string,
+    pinCode: string,
+    airtelNumber: string,
+    airtelName: string
+): Promise<ActionResult> {
     const supabase = getSupabase();
 
     const { error } = await supabase
         .from("shops")
-        .insert({ name, location: location || null, pin_code: pinCode || null });
+        .insert({
+            name,
+            location: location || null,
+            pin_code: pinCode || null,
+            airtel_number: airtelNumber || null,
+            airtel_name: airtelName || null
+        });
 
     if (error) {
         console.error("[KithLy Admin] Shop create failed:", error.message);
@@ -214,7 +226,7 @@ export async function createItem(
             title,
             description: description || null,
             price_amount: priceAmount,
-            currency: "MWK",
+            currency: "ZMW",
             image_url: imageUrl || null,
             in_stock: true,
         });

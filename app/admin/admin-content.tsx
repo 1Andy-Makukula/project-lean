@@ -36,7 +36,7 @@ async function getAdminData() {
         recipientPhone: intent.recipient_phone || "Unknown",
         itemTitle: intent.items?.title || "Unknown item",
         shopName: intent.items?.shops?.name || "Unknown shop",
-        price: formatPrice(intent.items?.price_amount || 0, intent.items?.currency || "MWK"),
+        price: formatPrice(intent.items?.price_amount || 0, intent.items?.currency || "ZMW"),
     }));
 }
 

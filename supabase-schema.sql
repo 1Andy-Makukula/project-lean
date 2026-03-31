@@ -16,8 +16,8 @@ CREATE TABLE IF NOT EXISTS public.items (
     id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     shop_id      UUID NOT NULL REFERENCES public.shops(id) ON DELETE CASCADE,
     title        TEXT NOT NULL,
-    price_amount INTEGER NOT NULL,          -- minor units (e.g. MWK tambala)
-    currency     TEXT NOT NULL DEFAULT 'MWK',
+    price_amount INTEGER NOT NULL,          -- minor units (e.g. ZMW tambala)
+    currency     TEXT NOT NULL DEFAULT 'ZMW',
     image_url    TEXT,
     in_stock     BOOLEAN NOT NULL DEFAULT true,
     created_at   TIMESTAMPTZ NOT NULL DEFAULT now()

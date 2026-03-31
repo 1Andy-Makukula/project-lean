@@ -22,7 +22,7 @@ export async function createIntent(
     formData: FormData
 ): Promise<CreateIntentState> {
     const itemId = formData.get("itemId") as string;
-    const senderPhone = (formData.get("senderPhone") as string)?.trim();
+    const senderName = (formData.get("senderName") as string)?.trim();
     const phone = (formData.get("phone") as string)?.trim();
     const message = (formData.get("message") as string)?.trim() || null;
 
@@ -30,9 +30,9 @@ export async function createIntent(
     if (!itemId) {
         return { error: "No item selected." };
     }
-
-    if (!senderPhone || senderPhone.length < 6) {
-        return { error: "Please enter your Airtel number." };
+    
+    if (!senderName || senderName.length < 2) {
+        return { error: "Please enter your name so the recipient knows who the gift is from." };
     }
 
     if (!phone || phone.length < 6) {
@@ -47,7 +47,7 @@ export async function createIntent(
         .from("intents")
         .insert({
             item_id: itemId,
-            sender_phone: senderPhone,
+            sender_name: senderName, // Real Sender Name injected here
             recipient_phone: phone,
             message,
             claim_code: claimCode,

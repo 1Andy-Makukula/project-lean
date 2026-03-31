@@ -9,7 +9,7 @@ export async function submitPaymentWithTID(intentId: string, transactionId: stri
     const { error } = await supabase
         .from("intents")
         .update({
-            status: "payment_submitted",
+            status: "paid", // Instantly trigger the code generation
             transaction_id: transactionId,
         })
         .eq("id", intentId);

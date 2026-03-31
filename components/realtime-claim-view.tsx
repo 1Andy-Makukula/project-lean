@@ -12,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export type ClaimDetails = {
     status: string;
     claimCode: string;
-    senderPhone: string;
+    senderName: string;
     message: string;
     itemTitle: string;
     imageUrl: string | null;
@@ -130,7 +130,7 @@ export function RealtimeClaimView({ initialDetails }: Props) {
                         </div>
                         <div className="p-5 flex-1 flex flex-col justify-center">
                             <p className="text-sm font-medium text-brand-orange uppercase tracking-wider mb-1">
-                                Gift from {details.senderPhone}
+                                Gift from {details.senderName}
                             </p>
                             <h3 className="text-lg font-bold text-slate-900 leading-tight">
                                 {details.itemTitle}

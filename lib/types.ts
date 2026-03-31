@@ -12,7 +12,7 @@ export type DbItem = {
     shop_id: string;
     title: string;
     description: string | null;
-    price_amount: number;   // minor units (e.g. MWK tambala)
+    price_amount: number;   // minor units (e.g. ZMW tambala)
     currency: string;
     image_url: string | null;
     in_stock: boolean;
@@ -38,14 +38,14 @@ export type FeedItem = {
     shop: string;           // denormalised shop name
     title: string;
     description: string | null;
-    price: string;          // formatted, e.g. "MWK 18,000"
+    price: string;          // formatted, e.g. "ZMW 18,000"
     eta: string;
     image_url: string | null;
 };
 
 // ── Helpers ─────────────────────────────────────────────────
 
-/** Format minor-unit amount → human price, e.g. 18000 → "MWK 18,000" */
-export function formatPrice(amount: number, currency = "MWK"): string {
+/** Format minor-unit amount → human price, e.g. 18000 → "ZMW 18,000" */
+export function formatPrice(amount: number, currency = "ZMW"): string {
     return `${currency} ${amount.toLocaleString("en")}`;
 }

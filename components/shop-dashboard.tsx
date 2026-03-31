@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Link2, MessageCircleMore, Package, TrendingUp, ShoppingBag, Loader2, ImageIcon } from "lucide-react";
+import { Link2, MessageCircleMore, Package, TrendingUp, ShoppingBag, Loader2, ImageIcon, Clock, CheckCircle2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -68,7 +68,7 @@ export function ShopDashboard({ shopId, shopName }: Props) {
                         <TrendingUp className="h-4 w-4 text-emerald-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-slate-900">{formatPrice(metrics.revenue, "MWK")}</div>
+                        <div className="text-2xl font-bold text-slate-900">{formatPrice(metrics.revenue, "ZMW")}</div>
                     </CardContent>
                 </Card>
                 <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
@@ -82,11 +82,11 @@ export function ShopDashboard({ shopId, shopName }: Props) {
                 </Card>
                 <Card className="border-slate-200 shadow-sm hover:shadow-md transition-shadow">
                     <CardHeader className="pb-2 flex flex-row items-center justify-between space-y-0">
-                        <CardTitle className="text-sm font-medium text-slate-500">Active Menu</CardTitle>
-                        <Package className="h-4 w-4 text-slate-400" />
+                        <CardTitle className="text-sm font-medium text-slate-500">Pending Orders</CardTitle>
+                        <Clock className="h-4 w-4 text-amber-500" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold text-slate-900">{metrics.items.length}</div>
+                        <div className="text-2xl font-bold text-slate-900">{metrics.pendingOrders.length}</div>
                     </CardContent>
                 </Card>
             </div>
@@ -98,49 +98,58 @@ export function ShopDashboard({ shopId, shopName }: Props) {
                 </CardContent>
             </Card>
 
-            {/* ── Section 3: Your Menu ───────────────────── */}
-            <div>
-                <h2 className="text-lg font-bold text-slate-900 mb-4">Your Menu</h2>
-                {metrics.items.length === 0 ? (
-                    <div className="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
-                        No items listed yet. Contact the admin to add items to your shop.
-                    </div>
-                ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {metrics.items.map((item) => (
-                            <Card key={item.id} className="border-slate-200 shadow-sm overflow-hidden">
-                                <div className="flex h-full">
-                                    <div className="relative w-24 h-full min-h-[5rem] bg-slate-100 shrink-0">
-                                        {item.imageUrl ? (
-                                            <Image src={item.imageUrl} alt={item.title} fill className="object-cover" sizes="96px" />
-                                        ) : (
-                                            <div className="absolute inset-0 flex items-center justify-center">
-                                                <ImageIcon className="h-5 w-5 text-slate-300" />
-                                            </div>
-                                        )}
-                                    </div>
-                                    <div className="p-3 flex-1 flex flex-col justify-between">
+            {/* ── Section 3: The Queues ───────────────────── */}
+            <div className="grid gap-6 md:grid-cols-2">
+                {/* Pending Queue */}
+                <div className="space-y-4">
+                    <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <Clock className="h-5 w-5 text-amber-500" /> Pending Orders
+                    </h2>
+                    {metrics.pendingOrders.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
+                            No pending orders.
+                        </div>
+                    ) : (
+                        <div className="space-y-3">
+                            {metrics.pendingOrders.map(order => (
+                                <Card key={order.id} className="border-amber-200 bg-amber-50/50">
+                                    <CardContent className="p-4 flex justify-between items-center">
                                         <div>
-                                            <p className="font-semibold text-slate-900 line-clamp-1">{item.title}</p>
-                                            <p className="text-sm text-slate-500">{item.price}</p>
+                                            <p className="font-bold text-slate-900">{order.title}</p>
+                                            <p className="text-xs font-mono text-slate-500 mt-1">TID: {order.transactionId}</p>
                                         </div>
-                                        <div className="mt-2">
-                                            {item.inStock ? (
-                                                <span className="inline-flex items-center rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700 ring-1 ring-inset ring-green-600/20">
-                                                    In Stock
-                                                </span>
-                                            ) : (
-                                                <span className="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600 ring-1 ring-inset ring-slate-500/10">
-                                                    Out of Stock
-                                                </span>
-                                            )}
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                {/* Completed Queue */}
+                <div className="space-y-4">
+                    <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                        <CheckCircle2 className="h-5 w-5 text-emerald-500" /> Completed Sales
+                    </h2>
+                    {metrics.completedOrders.length === 0 ? (
+                        <div className="rounded-2xl border border-dashed border-slate-300 p-6 text-center text-sm text-slate-500">
+                            No sales yet.
+                        </div>
+                    ) : (
+                        <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2">
+                            {metrics.completedOrders.map(order => (
+                                <Card key={order.id} className="border-slate-200 opacity-75">
+                                    <CardContent className="p-4 flex justify-between items-center">
+                                        <div>
+                                            <p className="font-semibold text-slate-900 line-through">{order.title}</p>
+                                            <p className="text-xs font-mono text-slate-500 mt-1">TID: {order.transactionId}</p>
                                         </div>
-                                    </div>
-                                </div>
-                            </Card>
-                        ))}
-                    </div>
-                )}
+                                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </div>
+                    )}
+                </div>
             </div>
 
             {/* ── Section 4: Grow Your Sales ─────────────── */}
@@ -156,7 +165,7 @@ export function ShopDashboard({ shopId, shopName }: Props) {
                         <Link2 className="h-5 w-5 text-slate-300 shrink-0" />
                         <p className="text-sm text-slate-200 truncate">{shareUrl}</p>
                     </div>
-                    <Button 
+                    <Button
                         onClick={() => window.open(whatsappLink, "_blank", "noopener,noreferrer")}
                         className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-white gap-2 font-semibold h-12"
                     >
